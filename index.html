@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+  <div id="bar_chart">
+  </div>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+    // d3.json("data_bar_chart.json", function(error, data) {
+    //   if (error) throw error;
+
+    // var parseTime = d3.timeParse("%M:%S");
+    // var timeformat = d3.timeFormat("%M:%S")
+
+    var data = [{
+      "name": "A",
+      "val1": 6,
+      "val2": 2
+    }, {
+      "name": "B",
+      "val1": 5,
+      "val2": 4
+    }]
+
+    data.forEach(function(d) {
+      // d.atime = parseTime(d.atime);
+      d.value = +d.value;
+    });
+
+    var margin = {
+        top: 50,
+        right: 50,
+        bottom: 100,
+        left: 80
+      },
+      width = 1500 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom;
+
+    var x = d3.scaleBand()
+      .domain(data.map(function(d) {
+        return d.name
+      }))
+      .range([0, width / 4]);
+
+    var y1 = d3.scaleLinear()
+      .domain([0, d3.max(data, function(d) {
+        return d.val1
+      })])
+      .range([height, 0]);
+
+    var y2 = d3.scaleLinear()
+      .domain([0, d3.max(data, function(d) {
+        return d.val2
+      })])
+      .range([height, 0]);
+
+    var svg = d3.select("#bar_chart")
+      .data(data)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Add the X Axis
+    svg.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+    // Add the Y Axis
+    svg.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y1)
+        .ticks(7));
+
+    var tooltip = d3.select("#info")
+      .append("div")
+      .style("position", "absolute")
+      .style("z-index", "10")
+      .style("visibility", "hidden");
+
+    var rects = svg.selectAll('rect')
+      .data(data);
+
+    //********* Bar Chart 1 ****************
+    var newRects1 = rects.enter();
+
+    newRects1.append('rect')
+      .attr('x', function(d, i) {
+        return x(d.name);
+      })
+      .attr('y', function(d, i) {
+        return y1(d.val1);
+      })
+      .attr('height', function(d, i) {
+        return height - y1(d.val1)
+      })
+      .attr('width', 40)
+      .attr("transform", "translate(" + 65 + ",0)")
+      .style('fill', 'blue')
+      .style('stroke', 'gray')
+      .attr('class', function(d, i) {
+        'class-' + i
+      })
+      .on("mouseover", function(d) {
+        // return tooltip.style("fill", "red")
+        d3.select(this).style("fill", "lightsteelblue")
+      })
+      .on("mouseout", function(d) {
+        // return tooltip.style("fill", "red")
+        d3.select(this).style("fill", "blue")
+      });
+
+    //********* Bar Chart 2 ****************
+    var newRects2 = rects.enter();
+
+    newRects2.append('rect')
+      .attr('x', function(d, i) {
+        return x(d.name);
+      })
+      .attr('y', function(d, i) {
+        return y1(d.val2);
+      })
+      .attr('height', function(d, i) {
+        return height - y1(d.val2)
+      })
+      .attr('width', 40)
+      .attr("transform", "translate(" + 65 + ",0)")
+      .style('fill', 'green')
+      .style('stroke', 'gray')
+      .attr('class', function(d, i) {
+        'class-' + i
+      })
+      .on("mouseover", function(d) {
+        // return tooltip.style("fill", "red")
+        d3.select(this).style("fill", "lightgreen")
+      })
+      .on("mouseout", function(d) {
+        // return tooltip.style("fill", "red")
+        d3.select(this).style("fill", "green")
+      });
+    // });
+  </script>
